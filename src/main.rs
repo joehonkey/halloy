@@ -1236,12 +1236,24 @@ impl Halloy {
             Message::TrayIconClicked => {
                 if !self.window_open {
                     self.window_open = true;
+                    let saved = data::Window::from(self.main_window);
+                    let position = saved
+                        .position
+                        .map(window::Position::Specific)
+                        .unwrap_or(window::Position::Default);
+                    let maximized = saved.maximized;
                     let (id, task) = window::open(window::Settings {
                         exit_on_close_request: false,
+                        position,
+                        size: saved.size,
                         ..window::settings(&self.config)
                     });
                     self.main_window = Window::new(id);
-                    task.then(|_| Task::none())
+                    if maximized {
+                        task.then(move |_| window::maximize(id, true))
+                    } else {
+                        task.then(|_| Task::none())
+                    }
                 } else {
                     let save = Task::perform(
                         data::Window::from(self.main_window).save(),
@@ -1254,12 +1266,24 @@ impl Halloy {
             Message::TrayMenuShow => {
                 if !self.window_open {
                     self.window_open = true;
+                    let saved = data::Window::from(self.main_window);
+                    let position = saved
+                        .position
+                        .map(window::Position::Specific)
+                        .unwrap_or(window::Position::Default);
+                    let maximized = saved.maximized;
                     let (id, task) = window::open(window::Settings {
                         exit_on_close_request: false,
+                        position,
+                        size: saved.size,
                         ..window::settings(&self.config)
                     });
                     self.main_window = Window::new(id);
-                    task.then(|_| Task::none())
+                    if maximized {
+                        task.then(move |_| window::maximize(id, true))
+                    } else {
+                        task.then(|_| Task::none())
+                    }
                 } else {
                     Task::none()
                 }
