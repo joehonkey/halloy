@@ -123,6 +123,17 @@ pub fn settings(_config: &Config) -> Settings {
 pub fn settings(config: &Config) -> Settings {
     use data::environment;
     use iced::window;
+    use image::EncodableLayout;
+
+    let icon = image::load_from_memory_with_format(
+        include_bytes!("../assets/logo.png"),
+        image::ImageFormat::Png,
+    )
+    .ok()
+    .and_then(|img| img.as_rgba8().map(|rgba| {
+        window::icon::from_rgba(rgba.as_bytes().to_vec(), rgba.width(), rgba.height()).ok()
+    }))
+    .flatten();
 
     Settings {
         platform_specific: window::settings::PlatformSpecific {
@@ -131,6 +142,7 @@ pub fn settings(config: &Config) -> Settings {
         },
         decorations: config.platform_specific.linux.decorations,
         transparent: true,
+        icon,
         ..Default::default()
     }
 }
