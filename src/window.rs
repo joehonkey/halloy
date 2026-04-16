@@ -116,7 +116,25 @@ pub enum Event {
     target_os = "windows"
 )))]
 pub fn settings(_config: &Config) -> Settings {
-    Settings::default()
+    use iced::window;
+    use image::EncodableLayout;
+
+    let icon = image::load_from_memory_with_format(
+        include_bytes!("../assets/logo.png"),
+        image::ImageFormat::Png,
+    )
+    .ok()
+    .and_then(|img| {
+        img.as_rgba8().map(|rgba| {
+            window::icon::from_rgba(rgba.as_bytes().to_vec(), rgba.width(), rgba.height()).ok()
+        })
+    })
+    .flatten();
+
+    Settings {
+        icon,
+        ..Default::default()
+    }
 }
 
 #[cfg(target_os = "linux")]
