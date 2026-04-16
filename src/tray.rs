@@ -3,25 +3,25 @@ use iced::Subscription;
 use crate::Message;
 
 pub fn init() -> bool {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
     return linux::init();
 
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
     return desktop::init();
 }
 
 pub fn subscription() -> Subscription<Message> {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
     return linux::subscription();
 
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
     return desktop::subscription();
 }
 
-// Linux uses ksni which speaks the StatusNotifierItem DBus protocol directly.
+// Linux and FreeBSD use ksni which speaks the StatusNotifierItem DBus protocol directly.
 // This gives us separate left-click (activate) and right-click (menu) events.
 // ksni needs its own single-threaded tokio runtime running in a background thread.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod linux {
     use std::sync::{Mutex, OnceLock};
 
@@ -153,7 +153,7 @@ mod linux {
 // Windows and macOS use the tray-icon crate which provides native implementations
 // on each platform. The TrayIcon is kept in thread-local storage since AppKit
 // objects on macOS must stay on the main thread.
-#[cfg(not(target_os = "linux"))]
+#[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
 mod desktop {
     use std::cell::RefCell;
     use std::time::Duration;

@@ -127,7 +127,7 @@ iced = { workspace = true, features = [
     "debug",
 ] }
 
-[target.'cfg(target_os = "linux")'.dependencies]
+[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
 ksni = "0.3.4"
 
 [target.'cfg(windows)'.dependencies]
