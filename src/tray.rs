@@ -18,9 +18,7 @@ pub fn subscription() -> Subscription<Message> {
     return desktop::subscription();
 }
 
-// Linux and FreeBSD use ksni which speaks the StatusNotifierItem DBus protocol directly.
-// This gives us separate left-click (activate) and right-click (menu) events.
-// ksni needs its own single-threaded tokio runtime running in a background thread.
+// ksni uses StatusNotifierItem over DBus - gives proper separate click events
 #[cfg(any(target_os = "linux", target_os = "freebsd"))]
 mod linux {
     use std::sync::{Mutex, OnceLock};
@@ -150,9 +148,7 @@ mod linux {
     }
 }
 
-// Windows and macOS use the tray-icon crate which provides native implementations
-// on each platform. The TrayIcon is kept in thread-local storage since AppKit
-// objects on macOS must stay on the main thread.
+// macOS requires AppKit objects on the main thread, hence thread_local storage
 #[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
 mod desktop {
     use std::cell::RefCell;
