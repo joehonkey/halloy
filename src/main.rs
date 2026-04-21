@@ -1387,9 +1387,6 @@ impl Halloy {
 
     fn subscription(&self) -> Subscription<Message> {
         let tick = iced::time::every(Duration::from_secs(1)).map(Message::Tick);
-        let animation_tick = iced::time::every(Duration::from_millis(50))
-            .map(Message::AnimationTick);
-
         let streams = Subscription::batch(
             self.servers
                 .entries()
